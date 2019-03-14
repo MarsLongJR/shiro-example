@@ -4,10 +4,13 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.security.Security;
 
 /**
  * @ClassName
@@ -16,6 +19,7 @@ import org.junit.Test;
  * @author:Mars
  */
 public class LoginLoutTest {
+    // 登录/退出简单默认测试
     @Test
     public void testHelloWorld(){
 
@@ -40,25 +44,22 @@ public class LoginLoutTest {
         subject.logout();
 
     }
-
-    public void test(){
-        Factory<SecurityManager> factory=new IniSecurityManagerFactory("classpath:shiro,ini");
+    //单数据源测试
+    @Test
+    public void singleRealm(){
+        Factory<SecurityManager> factory=new IniSecurityManagerFactory("classpath:shiro-realm.ini");
         SecurityManager securityManager=factory.getInstance();
         SecurityUtils.setSecurityManager(securityManager);
-
         Subject subject=SecurityUtils.getSubject();
-        UsernamePasswordToken usernamePasswordToken=new UsernamePasswordToken("wang","123");
+        UsernamePasswordToken usernamePasswordToken=new UsernamePasswordToken("zhang","123");
 
         try {
             subject.login(usernamePasswordToken);
         } catch (AuthenticationException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("true",subject.isAuthenticated());
-
+        Assert.assertEquals(true,subject.isAuthenticated());
         subject.logout();
-
     }
-
 
 }
