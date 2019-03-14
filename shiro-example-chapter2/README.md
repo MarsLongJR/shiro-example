@@ -74,4 +74,23 @@
     “select role_name from user_roles where username = ?”
     获取用户角色；“select permission from roles_permissions where role_name = ?”
     获取角色对应的权限信息；也可以调用相应的api进行自定义sql；
-    
+ 五、认证器和认证策略
+    1、Authenticator（认证器）的职责是验证用户的账号和密码
+    2、代码：public AuthenticationInfo authenticate(AuthenticationToken authenticationToken)  
+                     throws AuthenticationException;  
+    如果成功则返回AucaIn对象：验证信息，此信息中包含身份（principals）和凭证/证明（credentials）。
+    3、SecurityManage接口默认继承了Authenticator。另外还有一个ModularRealmAuthenticator实现，
+    其委托给多个Realm进行验证，验证规则通过AuthenticationStrategy接口指定，默认提供的实现：
+    1）FirstSuccessfulStrategy：只要有一个Realm验证成功即可，只返回第一个Realm身份验证成功的认证信息，
+    其他的忽略；
+    2）AtLeastOneSuccessfulStrategy：只要有一个Realm验证成功即可，和FirstSuccessfulStrategy不同，
+    返回所有Realm身份验证成功的认证信息；
+    3）AllSuccessfulStrategy：所有Realm验证成功才算成功，且返回所有Realm身份验证成功的认证信息，
+    如果有一个失败就失败了。
+    注意：ModularRealmAuthenticator默认使用AtLeastOneSuccessfulStrategy策略。
+    代码规定
+    假设我们有三个realm：
+    myRealm1： 用户名/密码为zhang/123时成功，且返回身份/凭据为zhang/123；
+    myRealm2： 用户名/密码为wang/123时成功，且返回身份/凭据为wang/123；
+    myRealm3： 用户名/密码为zhang/123时成功，且返回身份/凭据为zhang@163.com/123，
+    和myRealm1不同的是返回时的身份变了；
