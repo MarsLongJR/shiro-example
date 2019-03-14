@@ -43,3 +43,35 @@
     shiro从Realm中获得安全数据（用户、角色、权限），换句话说SEM要验证用户身份，那么它就需要从安全
     数据源中获取相应的用户进行比较以确定用户身份是否合法。也需要从数据源中获取相应用户的权限和角色进行验证
     用户是否可以操作。换句话说可以把realm看作一个数据源。
+1、代码
+    详细见：
+    1）单Realm配置：MyRealm1、shiro-realm.ini
+    2）多Realm配置：MyRealm1、MyRealm2、shiro-mutipart-realm.ini
+    注意：securityManager会按照realms指定的顺序进行身份认证。
+    此处我们使用显示指定顺序的方式指定了Realm的顺序，
+    如果删除“securityManager.realms=$myRealm1,$myRealm2”，
+    那么securityManager会按照realm声明的顺序进行使用（即无需设置realms属性，其会自动发现），
+    当我们显示指定realm后，其他没有指定realm将被忽略，如“securityManager.realms=$myRealm1”，
+    那么myRealm2不会被自动设置进去。
+    3）JDBC Realm：
+2、shiro默认提供了realm
+    Realm为接口。CacheRealm实现-->AuthenticatingRealm-->AuthorizingRealm。
+    以后一般继承AuthorizingRealm（授权）即可。其继承了AuthenticatingRealm（即身份验证），
+    而且也间接继承了CachingRealm（带有缓存实现）。
+    默认实现的类：
+    1）org.apache.shiro.realm.text.IniRealm：
+    [users]：指定用户名/密码及其角色；[roles]：指定角色即权限信息；
+    格式：
+    [users]         [roles]
+    zhang="123"     users="write"
+    2）org.apache.shiro.realm.text.PropertiesRealm： 
+    user.username=password,role1,role2 用户名:密码,角色1,角色2；
+    role.role1=permission1,permission2 角色：权限信息1，权限信息2；
+    3）org.apache.shiro.realm.jdbc.JdbcRealm：
+    通过sql查询相应的信息。
+    “select password from users where username = ?”获取用户密码，
+    “select password, password_salt from users where username = ?”获取用户密码及盐
+    “select role_name from user_roles where username = ?”
+    获取用户角色；“select permission from roles_permissions where role_name = ?”
+    获取角色对应的权限信息；也可以调用相应的api进行自定义sql；
+    
